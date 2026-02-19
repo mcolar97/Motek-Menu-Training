@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motek — Menu Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1E3575;
+    --navy-dark: #152860;
+    --navy-light: #2a4494;
+    --gold: #C9A84C;
+    --gold-light: #D4B86A;
+    --gold-pale: #F5EDD5;
+    --white: #FFFFFF;
+    --off-white: #F7F5F0;
+    --gray: #E8E4DC;
+    --navy-muted: rgba(30,53,117,0.45);
+    --navy-faint: rgba(30,53,117,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--off-white); color: var(--navy); font-family: 'DM Mono', monospace; min-height: 100vh; }
+
+/* HEADER */
+.site-header { text-align: center; padding: 40px 20px 20px; background: var(–navy); }
+.site-header h1 { font-family: ‘Playfair Display’, serif; font-size: clamp(2.8rem, 7vw, 4.5rem); letter-spacing: -1px; color: var(–white); }
+.site-header h1 span { color: var(–gold); font-style: italic; }
+.site-header p { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(–gold-light); margin-top: 6px; opacity: 0.8; }
+
+/* SECTION NAV */
+.section-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 16px 20px; background: var(–navy-dark); border-bottom: 2px solid var(–gold); margin-bottom: 8px; }
+.section-btn { font-family: ‘DM Mono’, monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 7px 16px; background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); cursor: pointer; border-radius: 20px; transition: all 0.2s; white-space: nowrap; }
+.section-btn.active { background: var(–gold); border-color: var(–gold); color: var(–navy-dark); font-weight: 500; }
+.section-btn:hover:not(.active) { border-color: var(–gold-light); color: var(–gold-light); }
+
+/* MODE TABS */
+.mode-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 14px 20px 6px; }
+.mode-tab { font-family: ‘DM Mono’, monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 14px; background: none; border: 1px solid rgba(30,53,117,0.25); color: var(–navy-muted); cursor: pointer; border-radius: 20px; transition: all 0.2s; }
+.mode-tab.active { background: var(–navy); border-color: var(–navy); color: var(–white); }
+.mode-tab.diet-tab.active { background: var(–gold); border-color: var(–gold); color: var(–navy-dark); }
+
+/* MAIN */
+.main { padding: 20px; max-width: 700px; margin: 0 auto; }
+
+/* PROGRESS */
+.counter { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(–navy-muted); text-align: center; margin-bottom: 12px; }
+.progress-wrap { width: 100%; height: 3px; background: var(–gray); border-radius: 2px; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(–gold); border-radius: 2px; transition: width 0.4s ease; }
+
+/* CARD */
+.card-scene { width: 100%; perspective: 1200px; cursor: pointer; }
+.card { width: 100%; min-height: 320px; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0.2,0.2,1); }
+.card.flipped { transform: rotateY(180deg); }
+.card-front, .card-back { position: absolute; width: 100%; min-height: 320px; backface-visibility: hidden; border-radius: 6px; padding: 40px 36px; display: flex; flex-direction: column; justify-content: center; }
+.card-front { background: var(–navy); color: var(–white); box-shadow: 0 8px 32px rgba(30,53,117,0.25); }
+.card-back { background: var(–white); border: 2px solid var(–gold); transform: rotateY(180deg); color: var(–navy); justify-content: flex-start; box-shadow: 0 8px 32px rgba(30,53,117,0.15); }
+.card-front .category-tag { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(–gold); opacity: 0.7; margin-bottom: 10px; }
+.card-front .dish-name { font-family: ‘Playfair Display’, serif; font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.1; color: var(–gold); margin-bottom: 14px; }
+.card-front .description { font-size: 0.75rem; line-height: 1.7; color: rgba(255,255,255,0.55); font-style: italic; }
+.card-front .prompt { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-top: auto; padding-top: 20px; }
+.card-back .sec-label { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(–gold); margin-top: 16px; margin-bottom: 5px; }
+.card-back .sec-label:first-child { margin-top: 0; }
+.card-back .sec-val { font-size: 0.8rem; line-height: 1.7; color: var(–navy); }
+.card-back .allergen-val { color: #B85C00; font-size: 0.78rem; line-height: 1.7; }
+.card-back .veg { display: inline-block; margin-top: 10px; padding: 2px 10px; border: 1px solid var(–navy); color: var(–navy); font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; border-radius: 20px; }
+.card-back .utensil { color: var(–navy-muted); }
+.card-back .flip-hint { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,53,117,0.2); margin-top: auto; padding-top: 16px; text-align: right; }
+
+/* CONTROLS */
+.controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+.btn { font-family: ‘DM Mono’, monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 24px; border: 1px solid var(–navy); background: none; color: var(–navy); cursor: pointer; border-radius: 20px; transition: all 0.2s; }
+.btn:hover { background: var(–navy); color: var(–white); }
+.btn-primary { background: var(–gold); border-color: var(–gold); color: var(–navy-dark); font-weight: 500; }
+.btn-primary:hover { background: var(–gold-light); border-color: var(–gold-light); color: var(–navy-dark); }
+
+/* QUIZ */
+.quiz-card { background: var(–navy); border-radius: 6px; padding: 36px; box-shadow: 0 8px 32px rgba(30,53,117,0.25); }
+.quiz-category { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(–gold); opacity: 0.6; margin-bottom: 6px; }
+.quiz-question { font-family: ‘Playfair Display’, serif; font-size: 1.5rem; color: var(–gold); margin-bottom: 6px; }
+.quiz-type { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 22px; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.quiz-opt { padding: 12px 14px; font-family: ‘DM Mono’, monospace; font-size: 0.72rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); cursor: pointer; border-radius: 4px; text-align: left; transition: all 0.2s; line-height: 1.4; }
+.quiz-opt:hover { border-color: var(–gold); background: rgba(201,168,76,0.1); }
+.quiz-opt.correct { background: rgba(30,100,30,0.25); border-color: #5a9a5a; color: #a0d4a0; }
+.quiz-opt.wrong { background: rgba(180,60,0,0.2); border-color: #c47a3a; color: #e8a070; }
+.quiz-result { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 16px; min-height: 20px; color: #7ac47a; }
+.quiz-result.wrong { color: #e8a070; }
+
+/* SCORE */
+.score-wrap { text-align: center; padding: 50px 20px; }
+.score-wrap h2 { font-family: ‘Playfair Display’, serif; font-size: 4rem; color: var(–navy); }
+.score-wrap p { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(–navy-muted); margin: 10px 0 32px; }
+
+/* LIST VIEW */
+.list-section-title { font-family: ‘Playfair Display’, serif; font-size: 1.6rem; color: var(–navy); border-bottom: 2px solid var(–gold); padding-bottom: 8px; margin: 36px 0 20px; }
+.list-item { border-bottom: 1px solid var(–navy-faint); padding: 22px 0; }
+.list-item h3 { font-family: ‘Playfair Display’, serif; font-size: 1.2rem; color: var(–navy); margin-bottom: 5px; }
+.list-item .l-desc { font-size: 0.75rem; color: var(–navy-muted); font-style: italic; line-height: 1.6; margin-bottom: 10px; }
+.list-row { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px; }
+.list-col { flex: 1; min-width: 160px; }
+.l-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(–gold); margin-bottom: 4px; }
+.l-val { font-size: 0.78rem; line-height: 1.6; color: var(–navy); }
+.l-allerg { color: #B85C00; }
+.l-veg-yes { color: #2a6e2a; font-size: 0.65rem; }
+.l-veg-no { color: rgba(30,53,117,0.3); font-size: 0.65rem; }
+
+/* WINE LIST VIEW */
+.wine-category { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(–navy); margin: 24px 0 8px; font-weight: 500; border-left: 3px solid var(–gold); padding-left: 10px; }
+.wine-subcategory { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(–navy-muted); margin: 14px 0 6px; }
+.wine-item { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(–navy-faint); gap: 12px; }
+.wine-name { font-size: 0.78rem; color: var(–navy); flex: 1; }
+.wine-detail { font-size: 0.68rem; color: var(–navy-muted); }
+.wine-price { font-size: 0.72rem; color: var(–gold); white-space: nowrap; font-weight: 500; }
+
+/* COCKTAIL CARDS */
+.cocktail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 8px; }
+.cocktail-card { background: var(–navy); border-radius: 6px; padding: 22px 24px; box-shadow: 0 4px 16px rgba(30,53,117,0.2); }
+.cocktail-name { font-family: ‘Playfair Display’, serif; font-size: 1.1rem; color: var(–gold); margin-bottom: 6px; }
+.cocktail-ingredients { font-size: 0.72rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+.cocktail-price { font-size: 0.65rem; color: var(–gold-light); margin-top: 8px; letter-spacing: 0.1em; }
+.cocktail-section-label { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(–navy); margin: 28px 0 12px; border-left: 3px solid var(–gold); padding-left: 10px; }
+
+@media (max-width: 500px) {
+.quiz-options { grid-template-columns: 1fr; }
+.card-front, .card-back { padding: 28px 22px; }
+.cocktail-grid { grid-template-columns: 1fr; }
+.list-row { flex-direction: column; gap: 10px; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="site-header">
+  <h1>mo<span>tek</span></h1>
+  <p>Full Menu Training</p>
+</div>
+
+<nav class="section-nav" id="section-nav"></nav>
+<div class="mode-tabs" id="mode-tabs">
+  <button class="mode-tab active" onclick="setMode('flash')">Flashcards</button>
+  <button class="mode-tab" onclick="setMode('quiz')">Quiz</button>
+  <button class="mode-tab" onclick="setMode('list')">Study All</button>
+  <button class="mode-tab diet-tab" onclick="setMode('gf')">🌾 Gluten Free</button>
+  <button class="mode-tab diet-tab" onclick="setMode('veg')">🥗 Vegetarian</button>
+  <button class="mode-tab diet-tab" onclick="setMode('vegan')">🌿 Vegan</button>
+</div>
+
+<div class="main">
+  <div id="flash-view"></div>
+  <div id="quiz-view" style="display:none"></div>
+  <div id="list-view" style="display:none"></div>
+  <div id="filter-view" style="display:none"></div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const sections = {
+  "Sweets": [
+    { name:"Halva Silan Ice Cream", category:"Sweets", desc:"Black sesame ice cream topped with shaved halva, candied pecans and halva silan (date honey).", ingredients:["Black Sesame Ice Cream","Halva","Silan (Date Honey)"], allergens:["Sesame","Nuts"], vegetarian:true, utensils:"Spoon" },
+    { name:"Baklava", category:"Sweets", desc:"Flaky Middle Eastern pastry made with layers of phyllo on top of pistachio.", ingredients:["Flour","Egg","Sugar","Pistachio"], allergens:["Gluten","Nuts","Egg"], vegetarian:true, utensils:"n/a" },
+    { name:"Pistachio Cheesecake", category:"Sweets", desc:"Labneh pistachio cheesecake topped with raspberry coulis.", ingredients:["Greek Yogurt","Vanilla","Cream Cheese","Pistachio Paste","Raspberry","Eggs"], allergens:["Dairy","Nuts","Egg"], vegetarian:true, utensils:"n/a" },
+    { name:"Knafeh", category:"Sweets", desc:"Traditional Middle Eastern dessert made with katafi. Underneath the layer of shredded noodle-like dough there is cheese.", ingredients:["Flour","Sugar","Butter","Cream","Cheese","Vanilla","Pistachio","Katafi Dough"], allergens:["Gluten","Dairy","Nuts"], vegetarian:true, utensils:"n/a" }
+  ],
+    { name:"Classic Hummus", category:"Hummus", desc:"Slow-cooked chickpeas mashed with tahini, lemon, garlic, finished with olive oil. Served with warm pita.", ingredients:["Tahini","Chickpea","Lemon Juice","Garlic","S'chug","Pinenuts","Parsley"], allergens:["Sesame","Garlic","Pepper","Pinenuts"], vegetarian:true, utensils:"Spoon" },
+    { name:"Mushroom Hummus", category:"Hummus", desc:"Slow-cooked chickpeas with caramelized onion and s'chug. Topped with button mushrooms.", ingredients:["Caramelized Onions","Button Mushrooms","Parsley","Pine Nut"], allergens:["Sesame","Mango","Pepper","Pinenuts","Garlic","Onion"], vegetarian:true, utensils:"Spoon" },
+    { name:"Roasted Eggplant Hummus", category:"Hummus", desc:"Hummus topped with egg, amba aioli, pickled onion. Features a fried poached egg.", ingredients:["Cherry Tomatoes","Pickled Onions","Fried Poached Egg","Amba Aioli","Sumac Onion"], allergens:["Mango","Pinenuts","Pepper","Garlic","Egg"], vegetarian:true, utensils:"Spoon" },
+    { name:"Prime Beef Hummus", category:"Hummus", desc:"Hummus topped with prime beef, spinach and pinenuts. Finished with pomegranate molasses. Served with warm pita.", ingredients:["Prime Beef","Spinach","Dry Cherries","Chickpeas","Onion","Pomegranate","Pomegranate Molasses"], allergens:["Sesame","Garlic","Pepper","Pinenuts","Onion","Cinnamon"], vegetarian:false, utensils:"Spoon" }
+  ],
+  "Cold Mezze": [
+    { name:"Lebanese Crudités", category:"Cold Mezze", desc:"Raw crudités for dipping.", ingredients:["Carrots","Cucumber","Watermelon Radish","Baby Gem Lettuce","Long Pepper","Black Olives","Green Bell Pepper","Scallions"], allergens:["Pepper","Onion"], vegetarian:true, utensils:"Tongs" },
+    { name:"Housemade Pickles", category:"Cold Mezze", desc:"Mixed variety of homemade pickles from spicy to non-spicy.", ingredients:["Pickled Cauliflower","Pickled Carrots","Pickled Onion","Middle Eastern Pickles","Red Fresco Peppers","Shikfa Peppers","Mango","Pepper"], allergens:["Onion","Garlic","Mango","Pepper"], vegetarian:true, utensils:"Tongs" },
+    { name:"Tzatziki", category:"Cold Mezze", desc:"Traditional Middle Eastern dip made with yogurt, cucumber, and fresh herbs. Served with Laffa.", ingredients:["Labneh","Cucumber","Dill","Olive Oil","Garlic","Mint","Lemon Juice","Garnish: Mint, Aleppo, Dill"], allergens:["Dairy","Garlic","Pepper"], vegetarian:true, utensils:"Spoon" },
+    { name:"Babaganoush", category:"Cold Mezze", desc:"Fire roasted eggplant with tahini and lemon juice, topped with pomegranate, za'atar and parsley. Served with Laffa.", ingredients:["Grilled Eggplant","Lemon Tahini","Lemon","Garlic","Garnish: Pomegranate Seeds, Parsley, Za'atar"], allergens:["Sesame","Garlic"], vegetarian:true, utensils:"Spoon" },
+    { name:"Labneh Za'atar", category:"Cold Mezze", desc:"Strained yogurt made from cow milk. Served with Laffa.", ingredients:["Olive Oil","Za'atar","Labneh","Crème Fraiche"], allergens:["Dairy","Sesame"], vegetarian:true, utensils:"Spoon" },
+    { name:"Muhammara", category:"Cold Mezze", desc:"Red bell pepper, pomegranate, walnuts. Finished with lemon tajin.", ingredients:["Pepper Paste","Pomegranate Molasses","Tahini","Walnuts","Panko","Cumin","Coriander","Paprika"], allergens:["Sesame","Red Bell Pepper","Gluten","Nuts","Paprika","Citrus"], vegetarian:true, utensils:"Spoon" },
+    { name:"Spicy Greek Feta", category:"Cold Mezze", desc:"Cheese base with roasted pepper and Fresno peppers.", ingredients:["Roasted Pepper","Pomegranate","Walnuts","Fresno Peppers"], allergens:["Dairy","Paprika"], vegetarian:true, utensils:"Spoon" },
+    { name:"Cauliflower Tabbouleh", category:"Cold Mezze", desc:"Modern take on tabbouleh using cauliflower instead of bulgur wheat, with parsley, cilantro, mint, scallions and pine nuts.", ingredients:["Cauliflower","Parsley","Mint","Scallions","Pomegranate","Cilantro","Pomegranate Vinaigrette","Baby Gem Lettuce"], allergens:["Onion","Pepper","Cilantro"], vegetarian:true, utensils:"Spoon" },
+    { name:"Roasted Eggplant (Mezze)", category:"Cold Mezze", desc:"Oven roasted eggplant topped with tahini, pine nuts and parsley.", ingredients:["Sumac","Pinenuts","Lemon Tahini","Mint","Roasted Eggplant","Mixed Cabbage on Bottom"], allergens:["Pinenuts","Sesame"], vegetarian:true, utensils:"Spoon" },
+    { name:"Marmalade (Labneh)", category:"Cold Mezze", desc:"Labneh topped with sweet red pepper jam, homemade by reducing thinly sliced peppers with sugar until it becomes a sweet jam. Topped with pistachio and almonds. Garnished with mint. Served with Laffa.", ingredients:["Sweet Red Pepper Jam","Pistachio","Lemon","Almonds"], allergens:["Nut","Pepper"], vegetarian:true, utensils:"Spoon" }
+  ],
+  "Oven Pita": [
+    { name:"Laffa (Plain)", category:"Oven Pita", desc:"House-made laffa fermented 48 hours, baked fresh daily. Brushed with olive oil, finished with sea salt.", ingredients:["Olive Oil","Nigella Seeds","Sea Salt","Flour","Water","Yeast","Salt","Sugar"], allergens:["Gluten","Soy"], vegetarian:true, utensils:"n/a" },
+    { name:"Artichoke Pita", category:"Oven Pita", desc:"House-made laffa topped with artichoke, parmesan cheese, caramelized onions and battera.", ingredients:["Artichoke","Goat Cheese","Parmesan","Sauteed Kale","Caramelized Onions","Green Kale"], allergens:["Gluten","Soy","Dairy","Onion"], vegetarian:true, utensils:"Scissors" },
+    { name:"French Pita", category:"Oven Pita", desc:"Laffa topped with gruyere, potato, truffle, caramelized onions and garlic confit.", ingredients:["Gruyere","Potato","Truffle","Caramelized Onions","Garlic Confit"], allergens:["Gluten","Soy","Dairy","Onion"], vegetarian:true, utensils:"Scissors" },
+    { name:"Italy Pita", category:"Oven Pita", desc:"Fresh mozzarella, tomato, basil, za'atar. A favourite for kids and adults alike.", ingredients:["Tomato Sauce","Mozzarella","Parmesan","Swiss Gruyere","Basil","Za'atar"], allergens:["Soy","Gluten","Dairy","Sesame"], vegetarian:true, utensils:"Scissors" },
+    { name:"Lebanon Pita", category:"Oven Pita", desc:"Topped with labneh cheese and za'atar oil mix. Spicy.", ingredients:["Labneh","Feta","Green Pepper","Za'atar","Grated Tomato"], allergens:["Gluten","Sesame","Dairy","Pepper","Soy"], vegetarian:true, utensils:"Scissors" },
+    { name:"Pastrami Pita", category:"Oven Pita", desc:"New York style flat pita topped with house smoked pastrami, pickles and caramelized onions.", ingredients:["House Smoked Pastrami","Mustard","Arugula","Caramelized Onion","Mayonnaise","Garlic Confit","Pickles","Fresno Chili","Grated Tomatoes"], allergens:["Onion","Garlic","Black Pepper","Mustard","Egg","Gluten","Soy"], vegetarian:false, utensils:"Scissors" },
+    { name:"Turkish Pita", category:"Oven Pita", desc:"Laffa with ground beef topped with cherry tomatoes, parsley, mint, red onion, baked in oven. Finished with Aleppo pepper and za'atar garnish.", ingredients:["Ground Beef","Cherry Tomatoes","Peppers","Parsley","Cilantro","Red Onion","Pomegranate","Sumac","Pine Nuts","Lemon Tahini"], allergens:["Gluten","Garlic","Tomato","Soy","Cinnamon","Pepper","Pine Nuts","Sesame"], vegetarian:false, utensils:"Scissors" }
+  ],
+  "Hot Mezze": [
+    { name:"Falafel", category:"Hot Mezze", desc:"Vibrant herb-forward blend of kale, zucchini, parsley, cilantro and chickpeas. Crispy on the outside, soft within. Aromatic onion, garlic, scallion and warm spices. Served with lemon tahini, amba, pickled onion and crispy eggplant.", ingredients:["Kale","Parsley","Cilantro","Chickpeas","Onion","Garlic","Scallion","Sesame","Cumin","Long Pepper","Lemon Tahini","Amba","Pickled Onion","Crispy Eggplant"], allergens:["Onion","Sesame","Mango","Paprika","Pepper","Garlic","Chickpeas","Cilantro"], vegetarian:true, utensils:"n/a" },
+    { name:"Crispy Cauliflower", category:"Hot Mezze", desc:"Tender steamed cauliflower florets lightly coated in rice flour for an airy, gluten-free delight. Finished with a harissa-honey glaze. Garnished with fresh leaves. Gluten free friendly.", ingredients:["Cauliflower Florets","Harissa Honey Glaze","Rice Flour","Mint Leaves","Paprika Spice"], allergens:["Cinnamon","Paprika","Onion","Pepper"], vegetarian:true, utensils:"n/a" },
+    { name:"Halloumi Date Skewer", category:"Hot Mezze", desc:"Alternating cubes of warm golden-fried halloumi cheese paired with soft sweet dates. Finished with pomegranate molasses, pickled onion and nigella seeds.", ingredients:["Halloumi Cheese","Pomegranate","Molasses","Dates","Pickled Onion","Nigella Seed"], allergens:["Dairy","Pepper","Onion","Cinnamon"], vegetarian:true, utensils:"n/a" },
+    { name:"Middle Eastern Dumplings", category:"Hot Mezze", desc:"Pillowy hand-formed dumplings (shish barak) filled with slow-roasted eggplant and labneh. Finished with chimichurri, pinenuts, sumac and dry yogurt.", ingredients:["Roasted Eggplant","Labneh","Mint","Garlic","Chimichurri","Pinenuts","Sumac Dry Yogurt"], allergens:["Gluten","Pinenuts","Cilantro","Garlic","Dairy"], vegetarian:true, utensils:"n/a" },
+    { name:"Crispy Eggplant", category:"Hot Mezze", desc:"Delicate golden slices coated in rice flour and fried to achieve a crisp exterior. Served with tzatziki and a drizzle of honey mint sauce. Garnished with parsley and vinaigrette.", ingredients:["Mint","Eggplant","Rice Flour","Paprika","Tzatziki","Honey Mint","Parsley","Vinaigrette"], allergens:["Garlic","Dill","Dairy","Mustard","Pepper"], vegetarian:true, utensils:"n/a" },
+    { name:"Crispy Artichoke", category:"Hot Mezze", desc:"Each tender artichoke heart is fried until beautifully crisp, with a soft earthy interior. Paired with cilantro aioli. Garnished with parsley, cilantro, mint and lemon.", ingredients:["Fried Artichoke","Cilantro Aioli","Garnish: Parsley, Cilantro, Mint, Lemon"], allergens:["Garlic","Cilantro","Eggs"], vegetarian:true, utensils:"n/a" },
+    { name:"Zucchini Latkes", category:"Hot Mezze", desc:"Simple mix of potatoes, white onion and green zucchini blended with parsley, dill, mint and scallion. Served with sweet labneh made with pepper and pomegranate, plus apple sauce. Garnished with fresh mint.", ingredients:["Potatoes","White Onion","Green Zucchini","Parsley","Dill","Scallion","Flour","Sugar","Sweet Labneh (pepper, labneh, pomegranate)","Apple Sauce","Mint"], allergens:["Gluten","Onion","Dairy","Pepper"], vegetarian:true, utensils:"n/a" },
+    { name:"Moroccan Cigars", category:"Hot Mezze", desc:"Hand-rolled phyllo cigar filled with seasoned beef and lamb, pine nuts and caramelized onion. Garnished with preserved lemon and tahini.", ingredients:["Phyllo Dough","Beef & Lamb Meat","Harissa Paste","Lemon Tahini","Preserved Lemon","Pine Nuts","Caramelized Onion","S'chug"], allergens:["Gluten","Pinenuts","Onion","Pepper","Garlic","Sesame"], vegetarian:false, utensils:"n/a" },
+    { name:"Basket of Lollipops", category:"Hot Mezze", desc:"Chicken drumsticks hand-trimmed and shaved at the bone for a playful lollipop presentation. Coated in a glossy glaze made from date molasses, harissa paste, masabacha base and apple cider vinegar. Garnishes: lime wedge, pickled carrots, shifka aioli, cilantro.", ingredients:["Chicken Drumsticks","Date Molasses","Harissa Paste","Masabacha Base","Apple Cider Vinegar","Garnish: Lime, Pickled Carrots, Shifka Aioli, Cilantro"], allergens:["Gluten","Eggs","Garlic","Cilantro","Pepper"], vegetarian:false, utensils:"n/a" },
+    { name:"Matboucha", category:"Hot Mezze", desc:"Traditional Moroccan spicy tomato stew (shashuka-style). Served with Jerusalem Crostini.", ingredients:["Tomato","Long Hot Peppers","Red Pepper","Paprika","Garlic","Olive Oil","Harissa"], allergens:["Garlic","Red Bell Pepper","Sesame (crostini)","Gluten (crostini)"], vegetarian:true, utensils:"Spoon" }
+  ],
+  "Skewers": [
+    { name:"Salmon Skewers", category:"Skewers", desc:"Salmon grilled over open flame with scallion, orange and fresh basil. Served over labneh and masabacha. Garnished with pickled onion and pickled fresno.", ingredients:["Salmon","Scallion","Orange","Basil","Aleppo Pepper","Garlic","Labneh","Masabacha","Pickled Onion","Pickled Fresno"], allergens:["Fish","Garlic","Onion","Pepper","Dairy"], vegetarian:false, utensils:"n/a" },
+    { name:"Halloumi Date Skewer", category:"Skewers", desc:"Alternating cubes of warm golden-fried halloumi cheese paired with soft sweet dates. Finished with pomegranate molasses for bright tangy depth, pickled onion for acidity and crunch, and nigella seeds for subtle earthiness.", ingredients:["Halloumi Cheese","Pomegranate","Molasses","Dates","Pickled Onion","Nigella Seed"], allergens:["Dairy","Pepper","Onion","Cinnamon"], vegetarian:true, utensils:"n/a" }
+  ],
+  "Kebabs": [
+    { name:"Chicken Shish Kebab", category:"Kebabs", desc:"Dark-meat chicken thighs marinated in shawarma spice, grilled over open flame. Served with roasted vegetable skewer, tahini and amba.", ingredients:["Chicken Thighs","Lemon Tahini","Amba","Grilled Vegetable Skewer (cauliflower, red onion, long pepper, fennel)"], allergens:["Paprika","Onion","Pepper","Mango (amba)","Sesame (sauce)"], vegetarian:false, utensils:"n/a" },
+    { name:"Beef Kufta Kebab", category:"Kebabs", desc:"Richly seasoned beef mix with sofrito, parsley and mixed spices, grilled over open flame. Served on laffa with roasted vegetable skewer. Note: contains gluten — cannot be removed.", ingredients:["Beef Mix","Lemon Tahini","Amba","Grilled Vegetable Skewer (cauliflower, red onion, long pepper, fennel)","Cilantro","Red Pepper","Onion"], allergens:["Onion","Cinnamon","Pepper","Mango (amba)","Sesame (sauce)","Gluten (beef mix — cannot remove)"], vegetarian:false, utensils:"n/a" },
+    { name:"Turkish Lamb Kebab", category:"Kebabs", desc:"Freshly ground lamb mix with parsley, cilantro, red pepper and onion, grilled over charcoal. Served on laffa with roasted vegetable skewer.", ingredients:["Lamb Mix (Parsley, Cilantro, Red Pepper, Onion)","Lemon Tahini","Amba","Grilled Vegetable Skewer (cauliflower, red onion, long pepper, fennel)"], allergens:["Onion","Pepper","Mango (amba)","Sesame (sauce)"], vegetarian:false, utensils:"n/a" }
+  ],
+  "From the Garden": [
+    { name:"Crunchy Cabbage", category:"From the Garden", desc:"Vibrant textural salad with finely shredded red and white cabbage, crispy shallots, toasted almonds and ja'ala seeds. Finished with bright mint-honey vinaigrette and chopped mint.", ingredients:["Red and White Cabbage","Crispy Shallots","Toasted Almonds","Ja'ala Seeds (sunflower, flax, sesame, nigella, hemp seeds)","Mint Honey Vinaigrette","Chopped Mint","Granulated Onion","Salt","Sugar","Olive Oil"], allergens:["Nuts","Sesame","Onion","Paprika","Garlic"], vegetarian:true, utensils:"Spoon" },
+    { name:"Summer Salad", category:"From the Garden", desc:"Bright and refreshing with chilled cubes of watermelon, pistachio for crunch, creamy feta and fragrant mint. Light drizzle of olive oil.", ingredients:["Watermelon","Pistachio","Feta","Mint","Olive Oil"], allergens:["Dairy","Nuts"], vegetarian:true, utensils:"Spoon" },
+    { name:"Fennel Pomegranate", category:"From the Garden", desc:"Finely shaved fennel with juicy orange segments, pomegranate and creamy feta. Topped with Sumac-candied pecans, parsley and black pepper. Finished with lemon juice and olive oil.", ingredients:["Fennel","Orange","Pomegranate","Feta","Sumac Candied Pecans","Parsley","Black Pepper","Lemon Juice","Olive Oil"], allergens:["Nuts","Dairy","Pepper"], vegetarian:true, utensils:"Fork & Spoon" },
+    { name:"Za'atar Greek", category:"From the Garden", desc:"Herb-forward Greek salad with a Middle Eastern twist. Cucumber, tomatoes, kalamata olives, red onion and green bell pepper tossed with fragrant dill, parsley and mint. Za'atar spice mix, capers and a touch of shifka pepper.", ingredients:["Cucumber","Tomatoes","Kalamata Olives","Red Onion","Feta","Lemon","Za'atar Spice Mix","Capers","Dill","Parsley","Mint","Green Bell Pepper","Baby Gem Lettuce","Shifka Pepper"], allergens:["Dairy","Sesame","Onion","Pepper"], vegetarian:true, utensils:"Spoon" },
+    { name:"Middle Eastern Chopped", category:"From the Garden", desc:"Fresh vibrant chopped salad with finely diced cucumber, tomato, red bell pepper, red cabbage, parsley, scallions, mint and cilantro. Tossed in olive oil and lemon juice. Topped with red onion and sumac powder.", ingredients:["Cucumber","Tomato","Red Bell Pepper","Red Cabbage","Parsley","Scallions","Mint","Cilantro","Olive Oil","Lemon Juice","Red Onion","Sumac Powder"], allergens:["Onion","Pepper","Cilantro","Sesame (crostino)","Gluten (crostino)"], vegetarian:true, utensils:"Spoon" },
+    { name:"Beet & Arugula", category:"From the Garden", desc:"Vibrant earthy salad of fresh arugula (higher quality arugula) tossed with red and yellow roasted beets. Creamy goat cheese and crunchy bharat walnut add richness. Finished with pomegranate vinaigrette.", ingredients:["Arugula","Red and Yellow Roasted Beets","Goat Cheese","Bharat Coated Walnuts","Pomegranate Seeds","Pomegranate Vinaigrette"], allergens:["Nuts","Dairy"], vegetarian:true, utensils:"Fork & Spoon" },
+    { name:"Warm Caesar", category:"From the Garden", desc:"Wood fire cabbage, parmesan, chives, crispy dates.", ingredients:["Wood Fire Cabbage","Parmesan","Chives","Crispy Dates"], allergens:["Dairy"], vegetarian:true, utensils:"n/a" }
+  ],
+  "Raw": [
+    { name:"Tuna Tartare", category:"Raw", desc:"Diced Ruby Red Tuna with red onion, cucumber, fried shallots, olive oil and lemon tahini. Note: Sunchokes = Jerusalem Artichokes.", ingredients:["Diced Tuna","Sunchokes (Jerusalem Artichokes)","Cucumber","Red Onion","Cilantro","Shallot","Lemon Tahini"], allergens:["Fish","Pinenuts","Sesame","Pepper","Onion"], vegetarian:false, utensils:"Spoon" },
+    { name:"Salmon Ceviche", category:"Raw", desc:"Faroe Island diced salmon with pomegranate, habanero roasted corn, red pepper, red onion, mint, peanuts, passion fruit and micro cilantro.", ingredients:["Diced Salmon","Pomegranate","Habanero","Roasted Corn","Red Pepper","Red Onion","Mint","Pinenuts","Leche de Tigre","Micro Cilantro"], allergens:["Fish","Sesame","Red Bell Pepper","Nuts","Paprika","Onion"], vegetarian:false, utensils:"Spoon" },
+    { name:"Tuna Carpaccio", category:"Raw", desc:"Thinly sliced Ruby Red Tuna garnished with fresh tomatoes, herbs and peppers.", ingredients:["Sliced Tuna","Capers","Jalapeño","Tomato","Garlic","Cilantro"], allergens:["Fish","Sesame","Garlic","Cilantro"], vegetarian:false, utensils:"Spoon" },
+    { name:"Ceviche Caliente", category:"Raw", desc:"Sea bass, za'atar hazelnuts, cilantro, mint, red onion, chifka chili, hawaii coconut leche de tigre.", ingredients:["Sea Bass","Za'atar Hazelnuts","Cilantro","Mint","Red Onion","Chifka Chili","Coconut Leche de Tigre"], allergens:["Fish","Nuts","Cilantro","Onion"], vegetarian:false, utensils:"Spoon" }
+  ],
+  "Plates": [
+    { name:"Chicken Shawarma Bowl", category:"Plates", desc:"All bowls come with Middle Eastern Salad, Sumac onions, Hummus and a base (Majadra Rice & Lentils or Cauliflower Couscous).", ingredients:["Chicken Breast and Thighs","Shawarma Spice","Pickled Onion","Parsley","S'chug","Pinenuts"], allergens:["Mango","Onion","Pinenuts","Pepper","Cinnamon (only in rice)","Sesame","Garlic"], vegetarian:false, utensils:"n/a" },
+    { name:"Chicken Schnitzel Bowl", category:"Plates", desc:"All bowls come with Middle Eastern Salad, Sumac onions, Hummus and a base (Majadra Rice or Cauliflower Couscous).", ingredients:["Chicken Schnitzel","Parsley","Pinenuts","S'chug","Lemon"], allergens:["Sesame","Gluten","Onion","Pinenuts","Pepper","Cinnamon (rice)","Garlic"], vegetarian:false, utensils:"n/a" },
+    { name:"Falafel Bowl", category:"Plates", desc:"All bowls come with Middle Eastern Salad, Sumac onions, Hummus and a base (Majadra Rice & Lentils or Cauliflower Couscous).", ingredients:["Falafel","S'chug","Pinenuts","Crispy Eggplant"], allergens:["Sesame","Pepper","Onion","Pine Nuts","Garlic","Cilantro","Cinnamon (rice)"], vegetarian:true, utensils:"n/a" },
+    { name:"Faroe Island Salmon Bowl", category:"Plates", desc:"All bowls come with Middle Eastern Salad, Sumac onions, Hummus and a base.", ingredients:["Faroe Islands Salmon","Parsley","Pinenuts","S'chug"], allergens:["Fish","Sesame","Onion","Pinenuts","Pepper","Cinnamon (rice)","Garlic"], vegetarian:false, utensils:"n/a" },
+    { name:"Grilled Chicken Bowl", category:"Plates", desc:"Grilled + sous vide chicken breast. Masabacha sauce cannot be removed. All bowls come with Middle Eastern Salad, Sumac onions and Hummus.", ingredients:["Grilled Chicken Breast","Sous Vide Chicken Breast","Masabacha Sauce (cannot remove)","Parsley","Pinenuts","S'chug"], allergens:["Sesame","Onion","Pinenuts","Pepper","Cinnamon (rice)","Garlic"], vegetarian:false, utensils:"n/a" },
+    { name:"Lamb Shawarma Bowl", category:"Plates", desc:"All bowls come with Middle Eastern Salad, Sumac onions, Hummus and a base.", ingredients:["Lamb","Shawarma Spice","Pickled Onion","Parsley","Pinenuts","S'chug"], allergens:["Sesame","Onion","Pinenuts","Pepper","Cinnamon (rice)","Garlic","Mango"], vegetarian:false, utensils:"n/a" },
+    { name:"Roasted Eggplant & Egg Bowl", category:"Plates", desc:"All bowls come with Middle Eastern Salad, Sumac onions, Hummus and a base.", ingredients:["Roasted Eggplant","Amba Aioli","Pickle Tempura Eggs","Fried Eggplant","Pickle Red Onion","Pinenuts","Parsley","S'chug"], allergens:["Sesame","Onion","Pinenuts","Pepper","Cinnamon (rice)","Garlic","Mango"], vegetarian:true, utensils:"n/a" },
+    { name:"Harissa Honey Salmon", category:"Plates", desc:"Faroe Island salmon glazed with harissa honey, topped with pickled onion and Fresno pickled pepper. Finished with parsley.", ingredients:["Faroe Island Salmon","Harissa Honey","Pickled Onion","Fresno Pickled Pepper","Lemon","Parsley (Garnish)"], allergens:["Fish","Red Bell Pepper (paprika)","Garlic","Onion"], vegetarian:false, utensils:"n/a" },
+    { name:"Whole Branzino", category:"Plates", desc:"Whole grilled branzino from Spain, head on, fully deboned. Grilled over open flame with garlic, crispy capers and charred rosemary.", ingredients:["Branzino Fish (Spain)","Garlic","Crispy Capers","Grilled Lemon","Rosemary","Salt","Olive Oil","Lemon Juice","Masabacha Sauce (on the side)"], allergens:["Fish","Garlic","Pepper"], vegetarian:false, utensils:"n/a" },
+    { name:"Moroccan Fish", category:"Plates", desc:"Chilean sea bass simmered in spicy tomato shakshuka with kalamata olives and preserved lemon. Served with baked challah.", ingredients:["Chilean Sea Bass","Chickpeas","Spicy Tomato Sauce","Kalamata Olives","Micro Cilantro","Long Hot Green Pepper","Pepper","Preserved Lemon","Cilantro","Harissa Paste"], allergens:["Fish","Red Bell Pepper","Garlic","Sesame (in challah)","Eggs (in challah)","Pepper","Chickpeas","Cilantro"], vegetarian:false, utensils:"n/a" },
+    { name:"Chicken Schnitzel (Plate)", category:"Plates", desc:"Crispy chicken schnitzel served as a plate.", ingredients:["Chicken Schnitzel","Lemon","Parsley"], allergens:["Gluten","Egg","Sesame"], vegetarian:false, utensils:"n/a" },
+    { name:"Lamb Shawarma (Plate)", category:"Plates", desc:"Lamb shawarma served as a plate.", ingredients:["Lamb","Shawarma Spice","Pickled Onion","Parsley","S'chug"], allergens:["Sesame","Onion","Garlic"], vegetarian:false, utensils:"n/a" },
+    { name:"Chicken Shawarma (Plate)", category:"Plates", desc:"Chicken shawarma served as a plate.", ingredients:["Chicken","Shawarma Spice","Pickled Onion","Parsley","S'chug"], allergens:["Sesame","Onion","Garlic"], vegetarian:false, utensils:"n/a" }
+  ],
+  "Sandwiches": [
+    { name:"Crispy Chicken Schnitzel Sandwich", category:"Sandwiches", desc:"Crispy chicken schnitzel on challah bread with homemade coleslaw, mediterranean pickles, roasted tomato and sumac onions. Finished with harissa aioli and shifka peppers.", ingredients:["Crispy Chicken Schnitzel","Cole Slaw","Challah Bread","Pickles","Tomato","Sumac Onion","Harissa Aioli","Shifka Pepper","Baby Pickle Cucumber"], allergens:["Gluten","Sesame","Egg","Onion","Garlic","Pepper"], vegetarian:false, utensils:"n/a" },
+    { name:"Ribeye on Baguette", category:"Sandwiches", desc:"Thinly sliced ribeye on Jerusalem baguette with caramelized onion, roasted tomato, salted cabbage, pickles and sumac onions. Finished with cilantro-garlic aioli.", ingredients:["Thinly Sliced Rib Eye Steak","Caramelized Onion","Tomato","Cabbage","Pickles","Cilantro Garlic Aioli","Sumac Onion","Shifka Pepper","Baby Pickle Cucumber"], allergens:["Gluten","Sesame","Egg","Onion","Garlic","Cilantro"], vegetarian:false, utensils:"n/a" },
+    { name:"Spicy Schnitzel & Eggplant", category:"Sandwiches", desc:"Crispy chicken schnitzel on challah with roasted eggplant, matboucha and long hot green pepper. Finished with lemon tahini. Lunch only.", ingredients:["Crispy Chicken Schnitzel","Challah Bread","Roasted Eggplant","Matboucha","Hot Green Pepper","Lemon Tahini"], allergens:["Gluten","Sesame","Onion","Eggs (in bread)","Pepper","Garlic"], vegetarian:false, utensils:"Steak knife" },
+    { name:"Arayes", category:"Sandwiches", desc:"Pita filled with kufta, lemon tahini and harissa aioli.", ingredients:["Pita","Kufta","Lemon Tahini","Harissa Aioli"], allergens:["Gluten","Sesame","Garlic"], vegetarian:false, utensils:"n/a" }
+  ],
+  "Steakhouse": [
+    { name:"8oz Hanger Steak", category:"Steakhouse", desc:"Char-grilled hanger steak basted with honey and wagyu-fat glaze. Served with handcut fries and peppercorn sauce.", ingredients:["Hanger Steak","Peppercorn","Salt","Handcut Fries","Peppercorn Sauce"], allergens:["Pepper","Onion","Sesame (sauce)"], vegetarian:false, utensils:"Steak knife" },
+    { name:"Baby Lamb Chops", category:"Steakhouse", desc:"Char-grilled over open flame. Served with majadra rice and pickled onions. Cannot substitute rice.", ingredients:["Lamb Chops","Majadra Rice","Pickled Onions","Chimichurri","Parsley","Cilantro","Roasted Tomato","Long Hot Pepper","Pomegranate"], allergens:["Onion","Cilantro","Cinnamon","Pepper","Garlic"], vegetarian:false, utensils:"Steak knife" },
+    { name:"25oz Dry Aged Ribeye", category:"Steakhouse", desc:"Dry-aged prime bone-in ribeye, char-grilled and sliced. Served with peppercorn sauce, chimichurri and a side of roasted garlic.", ingredients:["Prime Rib Eye","Salt","Black Pepper","Rosemary","Roasted Tomatoes","Roasted Garlic","Peppercorn Sauce (has tahini)","Chimichurri"], allergens:["Garlic","Pepper","Sesame (sauce)","Onion (sauce)"], vegetarian:false, utensils:"Steak knife" },
+    { name:"8oz Wagyu Burger", category:"Steakhouse", desc:"Wagyu burger with caramelized onion, red onion and pomegranate mint aioli.", ingredients:["Wagyu Beef","Caramelized Onion","Red Onion","Pomegranate Mint Aioli"], allergens:["Gluten","Sesame","Egg","Onion"], vegetarian:false, utensils:"Steak knife" }
+  ],
+  "Sides": [
+    { name:"Greek Lemon Potatoes", category:"Sides", desc:"Classic Greek-style roasted lemon potatoes.", ingredients:["Potatoes","Lemon","Olive Oil","Herbs"], allergens:[], vegetarian:true, utensils:"n/a" },
+    { name:"Fired Grilled Broccolini", category:"Sides", desc:"Grilled broccolini.", ingredients:["Broccolini","Olive Oil","Salt"], allergens:[], vegetarian:true, utensils:"n/a" },
+    { name:"Street Corn", category:"Sides", desc:"Mediterranean-style street corn.", ingredients:["Corn","Spices","Herbs"], allergens:[], vegetarian:true, utensils:"Spoon" },
+    { name:"Majadra Rice & Lentils", category:"Sides", desc:"Classic Middle Eastern rice and lentils.", ingredients:["Rice","Lentils","Caramelized Onion","Spices"], allergens:["Cinnamon","Onion"], vegetarian:true, utensils:"Spoon" },
+    { name:"Handcut Za'atar Fries", category:"Sides", desc:"Fries topped with Za'atar and served with a side of harissa aioli and cilantro aioli.", ingredients:["Fries","Za'atar Spice Mix","Harissa Aioli","Cilantro Aioli"], allergens:["Sesame","Egg","Garlic"], vegetarian:true, utensils:"n/a" },
+    { name:"Cauliflower Couscous", category:"Sides", desc:"Cauliflower couscous.", ingredients:["Cauliflower","Herbs","Spices"], allergens:[], vegetarian:true, utensils:"Spoon" },
+    { name:"Large Green Hot Peppers", category:"Sides", desc:"Whole grilled long hot green peppers.", ingredients:["Long Hot Green Peppers"], allergens:["Pepper"], vegetarian:true, utensils:"n/a" }
+  ],
+  "Sauces": [
+    { name:"S'chug", category:"Sauces", desc:"Grandma's secret sauce. Jalapeños and Serrano peppers blended into a spicy green sauce.", ingredients:["Jalapeños","Serrano Peppers","Herbs","Garlic","Olive Oil"], allergens:["Pepper"], vegetarian:true, utensils:"n/a" },
+    { name:"Harissa Aioli", category:"Sauces", desc:"Creamy aioli with harissa.", ingredients:["Aioli","Harissa","Red Bell Pepper"], allergens:["Egg","Sesame","Red Bell Pepper"], vegetarian:true, utensils:"n/a" },
+    { name:"Amba", category:"Sauces", desc:"Tangy pickled mango sauce.", ingredients:["Mango","Vinegar","Spices","Turmeric"], allergens:["Mango"], vegetarian:true, utensils:"n/a" },
+    { name:"Amba Aioli", category:"Sauces", desc:"Creamy aioli blended with amba.", ingredients:["Aioli","Amba","Mango"], allergens:["Egg","Mango"], vegetarian:true, utensils:"n/a" },
+    { name:"Chimichurri", category:"Sauces", desc:"Fresh herb chimichurri.", ingredients:["Parsley","Cilantro","Garlic","Olive Oil","Vinegar","Red Pepper Flakes"], allergens:["Garlic","Cilantro"], vegetarian:true, utensils:"n/a" },
+    { name:"Shifka Aioli", category:"Sauces", desc:"Spicy shifka pepper aioli.", ingredients:["Aioli","Shifka Peppers"], allergens:["Egg","Pepper"], vegetarian:true, utensils:"n/a" },
+    { name:"Lemon Tahini", category:"Sauces", desc:"Sesame tahini blended with lemon juice.", ingredients:["Tahini","Lemon Juice","Garlic","Water"], allergens:["Sesame"], vegetarian:true, utensils:"n/a" },
+    { name:"Garlic Cilantro", category:"Sauces", desc:"Garlic and cilantro sauce.", ingredients:["Garlic","Cilantro","Olive Oil","Lemon"], allergens:["Garlic","Cilantro"], vegetarian:true, utensils:"n/a" },
+    { name:"Grated Tomato", category:"Sauces", desc:"Fresh grated tomato sauce.", ingredients:["Tomato","Olive Oil","Salt"], allergens:[], vegetarian:true, utensils:"n/a" },
+    { name:"Masabacha", category:"Sauces", desc:"Whole chickpea sauce with tahini, warm spices.", ingredients:["Chickpeas","Tahini","Lemon","Garlic","Spices"], allergens:["Sesame","Garlic"], vegetarian:true, utensils:"n/a" }
+  ],
+  "Bread": [
+    { name:"Jerusalem Crostino", category:"Bread", desc:"Za'atar crostino.", ingredients:["Za'atar","Bread"], allergens:["Gluten"], vegetarian:true, utensils:"n/a" },
+    { name:"Jerusalem Bagel", category:"Bread", desc:"Classic sesame-coated Jerusalem bagel.", ingredients:["Flour","Sesame"], allergens:["Gluten","Sesame"], vegetarian:true, utensils:"n/a" },
+    { name:"Jerusalem Baguette", category:"Bread", desc:"Sesame-coated Jerusalem baguette.", ingredients:["Flour","Sesame"], allergens:["Gluten","Sesame"], vegetarian:true, utensils:"n/a" },
+    { name:"Challah Bread", category:"Bread", desc:"Traditional braided challah bread.", ingredients:["Flour","Eggs","Sesame"], allergens:["Gluten","Egg"], vegetarian:true, utensils:"n/a" },
+    { name:"Naked Pita", category:"Bread", desc:"Plain house pita.", ingredients:["Flour"], allergens:["Gluten"], vegetarian:true, utensils:"n/a" },
+    { name:"Laffa", category:"Bread", desc:"House-made laffa. Contains wheat flour, soy flour and rice flour.", ingredients:["Wheat Flour","Soy Flour","Rice Flour","Olive Oil","Yeast","Nigella Seeds","Salt","Sugar"], allergens:["Gluten","Soy"], vegetarian:true, utensils:"n/a" }
+  ]
+};
+
+const cocktails = {
+  "Signature Cocktails": [
+    { name:"Motek Margarita", ingredients:"Mezcal, Ginger, Turmeric, Lime, Coconut Salt", price:"$19" },
+    { name:"Guns & Roses", ingredients:"Rose-Infused Gin, Almond Syrup, Lemon, Egg White", price:"$18" },
+    { name:"Baharat Old Fashioned", ingredients:"Bourbon, Brown Sugar, Baharat Syrup", price:"$18" },
+    { name:"Watermelon Cooler", ingredients:"Tequila, Ancho Verde Liqueur", price:"$18" },
+    { name:"Cider & Spice", ingredients:"Vodka, Apple Cider, Ginger, Spiced Pear, Thyme", price:"$18" },
+    { name:"Nana Swizz", ingredients:"Rum, Arak, Honey, Blossom Water, Mint, Lime", price:"$17" },
+    { name:"Basiltini", ingredients:"Gin, Grapes, Basil", price:"$18" },
+    { name:"Jaffa Spritz", ingredients:"Vodka, Mandarin, Grapefruit, Aperol, Bubbles", price:"$19" },
+    { name:"Spicy Passion", ingredients:"Mezcal, Passion Fruit, Lime, Orange, Spicy Tinctures", price:"$19" }
+  ],
+  "Non-Alcoholic": [
+    { name:"Bazaar Breeze", ingredients:"Pomegranate Molasses, Cranberry, Baharat Spice", price:"$10" },
+    { name:"The Amalfi Spritz", ingredients:"Non-Alcoholic Spritz", price:"$11" },
+    { name:"Belly Dancer", ingredients:"Coconut Water, Passion Fruit, Vanilla-Rose, Matcha", price:"$10" },
+    { name:"Rimonana", ingredients:"Pomegranate lemonade", price:"$6" },
+    { name:"Iced Hibiscus Tea", ingredients:"House hibiscus tea", price:"$6" },
+    { name:"Fresh OJ", ingredients:"Fresh squeezed orange juice", price:"$13" }
+  ],
+  "Beers": [
+    { name:"Efes", ingredients:"Pilsner — Turkey", price:"$9" },
+    { name:"Alfa", ingredients:"Blond Lager — Greece", price:"$9" },
+    { name:"Schnitt Jaffa IPA", ingredients:"Kosher IPA — Israel", price:"$11" },
+    { name:"Goldstar", ingredients:"Kosher Dark Lager — Israel", price:"$9" },
+    { name:"Nesher Malt", ingredients:"Non-Alcoholic Kosher Malt", price:"$7" }
+  ],
+  "Smoothies": [
+    { name:"Berry Basil", ingredients:"Berry blend with fresh basil", price:"" },
+    { name:"Banana Tahini Silan", ingredients:"Banana, tahini, date syrup", price:"" },
+    { name:"Kale y Piña", ingredients:"Kale, pineapple", price:"" }
+  ]
+};
+
+const wines = {
+  "Bubbles": {
+    "": [
+      { name:"Prosecco", detail:"Zonin, NV, Veneto, Italy", price:"15 / 64" },
+      { name:"Champagne Brut", detail:"Impérial, Moët & Chandon, France — 187ml", price:"25" },
+      { name:"Champagne Brut", detail:"Père & Fils, Lanson, NV, France", price:"98" },
+      { name:"Champagne Brut", detail:"Moët & Chandon, NV, France", price:"125" },
+      { name:"Champagne Brut", detail:"Dom Pérignon, 2013, France", price:"465" },
+      { name:"Champagne Brut Rosé", detail:"Laurent Perrier, NV, France", price:"215" },
+      { name:"Champagne Brut", detail:"Laurent Perrier NV, France", price:"180" }
+    ]
+  },
+  "Rosé": {
+    "": [
+      { name:"Rosé de Provence", detail:"Peyrassol 'La Croix', 2023, France", price:"15 / 60" },
+      { name:"Ktima Roussos Rosé", detail:"Paros, Greece 2022", price:"64" }
+    ]
+  },
+  "Skin Contact": {
+    "": [
+      { name:"White Blend", detail:"'Tatto', Ruth Lewandowski, 2022, CA", price:"76" }
+    ]
+  },
+  "White": {
+    "Light, Fresh & Fun": [
+      { name:"Malagousia", detail:"Ktima Gerovassiliou, 2022, Epanomi, Greece", price:"85" },
+      { name:"Carricante", detail:"'Etna Bianco', SRC, 2021, Mt. Etna, Italy", price:"105" },
+      { name:"Pinot Grigio", detail:"Elena Walch, 2022, Alto Adige, Italy", price:"64" },
+      { name:"Sauvignon Blanc", detail:"Craggy Range 'Te Muna Road', 2023, Martinborough, NZ", price:"75" },
+      { name:"Sauvignon Blanc", detail:"Cantina Puiatti, 2023, Friuli, Italy", price:"16 / 17" },
+      { name:"Alvarinho", detail:"Soalheiro, 2023, Vino Verde, Portugal", price:"16 / 65" },
+      { name:"Assyrtiko", detail:"Ktima Rousos, 2023, Paros, Greece", price:"17 / 70" },
+      { name:"Assyrtiko", detail:"Canava Chrisou, 2023, Tslepos, Santorini, Greece", price:"120" },
+      { name:"Albarino", detail:"Casa do Sol, 'Froina' 2022, Rias Baixas, Spain", price:"68" },
+      { name:"Sauvignon Blanc", detail:"Sancere Domaine Doudeau Leger, 2022, Loire, France", price:"85" },
+      { name:"Cortese", detail:"Gavi La Fornace, Cinzia Bergaglio, 2022, Gavi, Italy", price:"68" }
+    ],
+    "Medium, Savory & Enticing": [
+      { name:"Trebbiano di Lugana", detail:"Olivini Lugana, 2022, Veneto, Italy", price:"75" },
+      { name:"White Blend", detail:"Kishor White, 2023, Israel", price:"88" }
+    ],
+    "Rich, Full & Luscious": [
+      { name:"Chablis", detail:"'L'expression', Venon & Fils, 2022, Burgundy, France", price:"18 / 75" },
+      { name:"Muscat de Alexandria", detail:"Savvoglou Tsivolas, 'Twin Suns' 2022, Limnos, Greece", price:"65" },
+      { name:"Malagousia", detail:"Ktima Gerovassiliou, 2022, Epanomi, Greece", price:"85" },
+      { name:"Chardonnay", detail:"Shafer 'Red Shoulder' 2023, Napa Valley, CA", price:"160" },
+      { name:"Chardonnay", detail:"Justin, 2022, Sonoma County, CA", price:"95" }
+    ]
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let activeSection = Object.keys(sections)[0];
+let activeMode = 'flash';
+let currentIdx = 0;
+let isFlipped = false;
+let quizItems = [];
+let quizIdx = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+// ============================================================
+// SECTION NAV
+// ============================================================
+function buildSectionNav() {
+  const nav = document.getElementById('section-nav');
+  const allSections = [...Object.keys(sections), 'Cocktails', 'Wine List'];
+  nav.innerHTML = allSections.map(s =>
+    `<button class="section-btn${s === activeSection ? ' active' : ''}" onclick="setSection('${s}')">${s}</button>`
+  ).join('');
+}
+
+function setSection(s) {
+  activeSection = s;
+  currentIdx = 0;
+  isFlipped = false;
+  buildSectionNav();
+  const isBev = s === 'Cocktails' || s === 'Wine List';
+  document.getElementById('mode-tabs').style.display = isBev ? 'none' : 'flex';
+  if (isBev) {
+    setMode('list');
+  } else {
+    const dietModes = ['gf','veg','vegan'];
+    setMode(dietModes.includes(activeMode) ? activeMode : (activeMode === 'list' ? 'list' : activeMode));
+  }
+}
+
+// ============================================================
+// MODE
+// ============================================================
+
+// Vegan: vegetarian AND no dairy AND no egg
+const dairyTerms = ['dairy','milk','cheese','labneh','feta','cream','gruyere','mozzarella','parmesan','halloumi','butter','crème','yogurt'];
+const eggTerms = ['egg'];
+const glutenTerms = ['gluten'];
+
+function isDairyFree(d) {
+  const check = [...d.allergens, ...d.ingredients].join(' ').toLowerCase();
+  return !dairyTerms.some(t => check.includes(t));
+}
+function isEggFree(d) {
+  const check = [...d.allergens, ...d.ingredients].join(' ').toLowerCase();
+  return !eggTerms.some(t => check.includes(t));
+}
+function isGlutenFree(d) {
+  const check = [...d.allergens, ...d.ingredients].join(' ').toLowerCase();
+  return !glutenTerms.some(t => check.includes(t));
+}
+function isVegan(d) {
+  return d.vegetarian && isDairyFree(d) && isEggFree(d);
+}
+
+function setMode(m) {
+  activeMode = m;
+  const modes = ['flash','quiz','list','gf','veg','vegan'];
+  document.querySelectorAll('.mode-tab').forEach((t, i) => {
+    t.classList.toggle('active', modes[i] === m);
+  });
+  document.getElementById('flash-view').style.display = m === 'flash' ? 'block' : 'none';
+  document.getElementById('quiz-view').style.display = m === 'quiz' ? 'block' : 'none';
+  document.getElementById('list-view').style.display = m === 'list' ? 'block' : 'none';
+  document.getElementById('filter-view').style.display = ['gf','veg','vegan'].includes(m) ? 'block' : 'none';
+
+  if (m === 'flash') renderFlash();
+  if (m === 'quiz') initQuiz();
+  if (m === 'list') renderList();
+  if (m === 'gf') renderFilter('gf');
+  if (m === 'veg') renderFilter('veg');
+  if (m === 'vegan') renderFilter('vegan');
+}
+
+function renderFilter(type) {
+  const config = {
+    gf:    { label:'Gluten Free Items', emoji:'🌾', note:'Items with no gluten-containing allergens. Always inform your server of a gluten allergy — cross-contamination risk exists in this kitchen.', fn: d => isGlutenFree(d) },
+    veg:   { label:'Vegetarian Options', emoji:'🥗', note:'Items marked as vegetarian. Ingredients are listed as-is — no modifications assumed.', fn: d => d.vegetarian },
+    vegan: { label:'Vegan Options', emoji:'🌿', note:'Items free from meat, dairy, and eggs based on listed ingredients. Always confirm with your server.', fn: d => isVegan(d) }
+  };
+  const { label, emoji, note, fn } = config[type];
+
+  // Collect all dishes across all food sections
+  const allDishes = Object.entries(sections).flatMap(([sec, items]) =>
+    items.filter(fn).map(d => ({ ...d, section: sec }))
+  );
+
+  // Group by section
+  const grouped = {};
+  allDishes.forEach(d => {
+    if (!grouped[d.section]) grouped[d.section] = [];
+    grouped[d.section].push(d);
+  });
+
+  let html = `
+    <div style="background:var(--navy);border-radius:6px;padding:20px 24px;margin-bottom:24px;">
+      <div style="font-size:1.6rem;margin-bottom:6px;">${emoji}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);margin-bottom:8px;">${label}</div>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.6;">${note}</div>
+      <div style="font-size:0.65rem;color:var(--gold);margin-top:12px;letter-spacing:0.1em;">${allDishes.length} items across ${Object.keys(grouped).length} sections</div>
+    </div>
+  `;
+
+  if (allDishes.length === 0) {
+    html += `<div style="text-align:center;padding:40px;color:var(--navy-muted);font-size:0.8rem;">No items found for this filter.</div>`;
+  }
+
+  for (const [sec, items] of Object.entries(grouped)) {
+    html += `<div class="list-section-title" style="margin-top:20px;">${sec}</div>`;
+    html += items.map(d => `
+      <div class="list-item">
+        <h3>${d.name}</h3>
+        <div class="l-desc">${d.desc}</div>
+        <div class="list-row">
+          <div class="list-col">
+            <div class="l-label">Ingredients</div>
+            <div class="l-val">${d.ingredients.join(' · ')}</div>
+          </div>
+          <div class="list-col">
+            <div class="l-label">Allergens</div>
+            <div class="l-val l-allerg">${d.allergens.length ? d.allergens.join(', ') : 'None listed'}</div>
+            <div class="l-label" style="margin-top:8px">Utensils</div>
+            <div class="l-val">${d.utensils}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('filter-view').innerHTML = html;
+}
+
+// ============================================================
+// FLASH
+// ============================================================
+function renderFlash() {
+  const items = sections[activeSection];
+  if (!items) return;
+  const d = items[currentIdx];
+  const pct = ((currentIdx + 1) / items.length * 100).toFixed(0);
+
+  document.getElementById('flash-view').innerHTML = `
+    <div class="counter">${currentIdx + 1} / ${items.length}</div>
+    <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="card-scene" onclick="flipCard()">
+      <div class="card${isFlipped ? ' flipped' : ''}" id="card">
+        <div class="card-front">
+          <div class="category-tag">${d.category}</div>
+          <div class="dish-name">${d.name}</div>
+          <div class="description">${d.desc}</div>
+          <div class="prompt">tap to reveal ingredients & allergens</div>
+        </div>
+        <div class="card-back">
+          <div class="sec-label">Ingredients</div>
+          <div class="sec-val">${d.ingredients.join(' · ')}</div>
+          <div class="sec-label">Allergens / Dietary</div>
+          <div class="allergen-val">${d.allergens.join(', ')}</div>
+          <div class="sec-label">Utensils</div>
+          <div class="sec-val utensil">${d.utensils}</div>
+          ${d.vegetarian ? '<span class="veg">✓ Vegetarian Option</span>' : ''}
+          <div class="flip-hint">tap to flip back</div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="navigate(-1)">← Prev</button>
+      <button class="btn" onclick="flipCard()">Flip</button>
+      <button class="btn" onclick="navigate(1)">Next →</button>
+    </div>
+  `;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  const card = document.getElementById('card');
+  if (card) card.classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir) {
+  const items = sections[activeSection];
+  currentIdx = (currentIdx + dir + items.length) % items.length;
+  isFlipped = false;
+  renderFlash();
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+const quizTypes = [
+  { label:"Name the Ingredients", fn: d => d.ingredients.join(', ') },
+  { label:"Name the Allergens", fn: d => d.allergens.join(', ') },
+  { label:"What are the serving utensils?", fn: d => d.utensils },
+];
+
+function initQuiz() {
+  const items = sections[activeSection];
+  quizItems = [];
+  items.forEach((d, i) => {
+    quizTypes.forEach(t => {
+      const ans = t.fn(d);
+      if (ans && ans !== 'n/a') quizItems.push({ d, i, type: t });
+    });
+  });
+  quizItems = quizItems.sort(() => Math.random() - 0.5).slice(0, Math.min(10, quizItems.length));
+  quizIdx = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const view = document.getElementById('quiz-view');
+  if (quizIdx >= quizItems.length) { showScore(); return; }
+  const q = quizItems[quizIdx];
+  const correct = q.type.fn(q.d);
+  const items = sections[activeSection];
+  const wrongPool = items.filter((_, i) => i !== q.i).map(dd => q.type.fn(dd)).filter(v => v && v !== 'n/a');
+  const opts = [correct, ...wrongPool.sort(() => Math.random() - 0.5).slice(0, 3)].sort(() => Math.random() - 0.5);
+  const pct = ((quizIdx + 1) / quizItems.length * 100).toFixed(0);
+
+  view.innerHTML = `
+    <div class="counter">Question ${quizIdx + 1} / ${quizItems.length}</div>
+    <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="quiz-card">
+      <div class="quiz-category">${q.d.category}</div>
+      <div class="quiz-question">${q.d.name}</div>
+      <div class="quiz-type">${q.type.label}</div>
+      <div class="quiz-options" id="quiz-opts">
+        ${opts.map(o => `<button class="quiz-opt" onclick="checkAnswer(this,'${CSS.escape(o)}','${CSS.escape(correct)}')">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-result" id="qres"></div>
+    </div>
+    <div class="controls" id="quiz-ctrl" style="margin-top:20px;display:none">
+      <button class="btn btn-primary" onclick="nextQ()">Next →</button>
+    </div>
+  `;
+}
+
+function checkAnswer(btn, selected, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const sel = CSS.unescape(selected);
+  const cor = CSS.unescape(correct);
+  document.querySelectorAll('.quiz-opt').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === cor) b.classList.add('correct');
+    else if (b.textContent === sel && sel !== cor) b.classList.add('wrong');
+  });
+  const res = document.getElementById('qres');
+  if (sel === cor) { res.textContent = '✓ Correct'; res.className = 'quiz-result'; quizScore++; }
+  else { res.textContent = '✗ Incorrect — correct: ' + cor.substring(0, 60) + (cor.length > 60 ? '…' : ''); res.className = 'quiz-result wrong'; }
+  document.getElementById('quiz-ctrl').style.display = 'flex';
+}
+
+function nextQ() { quizIdx++; quizAnswered = false; renderQuiz(); }
+
+function showScore() {
+  const pct = Math.round(quizScore / quizItems.length * 100);
+  document.getElementById('quiz-view').innerHTML = `
+    <div class="score-wrap">
+      <h2>${quizScore}/${quizItems.length}</h2>
+      <p>${pct >= 80 ? 'Ready for service.' : pct >= 60 ? 'Getting there — keep drilling.' : 'Keep studying. You\'ve got this.'}</p>
+      <button class="btn btn-primary" onclick="initQuiz()">Retry</button>
+      <button class="btn" onclick="setMode('list')" style="margin-left:8px">Study All</button>
+    </div>
+  `;
+}
+
+// ============================================================
+// LIST
+// ============================================================
+function renderList() {
+  const view = document.getElementById('list-view');
+  if (activeSection === 'Wine List') { renderWineList(view); return; }
+  if (activeSection === 'Cocktails') { renderCocktails(view); return; }
+
+  const items = sections[activeSection];
+  view.innerHTML = `
+    <div class="list-section-title">${activeSection}</div>
+    ${items.map(d => `
+      <div class="list-item">
+        <h3>${d.name}</h3>
+        <div class="l-desc">${d.desc}</div>
+        <div class="list-row">
+          <div class="list-col">
+            <div class="l-label">Ingredients</div>
+            <div class="l-val">${d.ingredients.join(' · ')}</div>
+          </div>
+          <div class="list-col">
+            <div class="l-label">Allergens</div>
+            <div class="l-val l-allerg">${d.allergens.join(', ')}</div>
+            <div class="l-label" style="margin-top:10px">Utensils</div>
+            <div class="l-val">${d.utensils}</div>
+            <div class="${d.vegetarian ? 'l-veg-yes' : 'l-veg-no'}" style="margin-top:6px">${d.vegetarian ? '✓ Vegetarian Option' : '✗ Not Vegetarian'}</div>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderCocktails(view) {
+  let html = '<div class="list-section-title">Cocktails & Drinks</div>';
+  for (const [cat, items] of Object.entries(cocktails)) {
+    html += `<div class="cocktail-section-label">${cat}</div><div class="cocktail-grid">`;
+    html += items.map(c => `
+      <div class="cocktail-card">
+        <div class="cocktail-name">${c.name}</div>
+        <div class="cocktail-ingredients">${c.ingredients}</div>
+        ${c.price ? `<div class="cocktail-price">${c.price}</div>` : ''}
+      </div>
+    `).join('');
+    html += '</div>';
+  }
+  view.innerHTML = html;
+}
+
+function renderWineList(view) {
+  let html = '<div class="list-section-title">Wine List</div>';
+  for (const [category, subs] of Object.entries(wines)) {
+    html += `<div class="wine-category">${category}</div>`;
+    for (const [sub, items] of Object.entries(subs)) {
+      if (sub) html += `<div class="wine-subcategory">${sub}</div>`;
+      html += items.map(w => `
+        <div class="wine-item">
+          <div>
+            <span class="wine-name">${w.name}</span>
+            <span class="wine-detail"> — ${w.detail}</span>
+          </div>
+          <div class="wine-price">${w.price}</div>
+        </div>
+      `).join('');
+    }
+  }
+  view.innerHTML = html;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildSectionNav();
+renderFlash();
+</script>
+
+</body>
+</html>
